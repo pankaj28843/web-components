@@ -1,10 +1,14 @@
 {
   "name": "@pankaj28843/web-components",
   "version": "0.1.0",
-  "description": "Private-use native web components with a shareable diff viewer bundle.",
+  "description": "A GitHub-style unified diff review web component with safe syntax highlighting.",
   "type": "module",
-  "private": true,
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pankaj28843/web-components.git"
+  },
+  "homepage": "https://github.com/pankaj28843/web-components",
   "types": "dist/types/index.d.ts",
   "exports": {
     ".": {

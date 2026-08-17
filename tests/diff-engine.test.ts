@@ -21,6 +21,7 @@ describe('createDiff', () => {
 
     expect(diff.error).toBeUndefined();
     expect(diff.rows).toHaveLength(0);
+    expect(diff.files).toHaveLength(0);
     expect(diff.stats).toMatchObject({ added: 0, removed: 0, changed: 0 });
   });
 });

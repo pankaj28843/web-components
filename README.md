@@ -1,9 +1,32 @@
 # Native web components
 
-This is a private-use TypeScript library for small, portable custom elements.
-The first component is `<wc-diff-viewer>`, a rich plain-text diff viewer that
-ships as a minified `dist/share.js` bundle and an IIFE bundle for projects that
-do not use a build tool.
+`<wc-diff-viewer>` renders a standard Git unified diff as a GitHub-style
+changed-files review: file navigation, status and mode metadata, hunk headers,
+old/new line gutters, unified or split view, responsive fallback, search, copy,
+and safe path-based syntax highlighting.
+
+## Minimal consumer
+
+```html
+<wc-diff-viewer id="review"></wc-diff-viewer>
+<script type="module">
+  import './dist/share.js';
+  const patch = `diff --git a/app.ts b/app.ts
+--- a/app.ts
++++ b/app.ts
+@@ -1 +1 @@
+-export const answer = 41;
++export const answer = 42;`;
+  document.querySelector('#review').diffText = patch;
+</script>
+```
+
+The element accepts `diffText` for a unified patch and also retains
+`oldText`/`newText` for direct text comparisons. Optional properties and
+attributes are `language="auto"`, `view="unified" | "split"`, `wrap`, `title`,
+`old-label`, `new-label`, and `path`. An explicit language wins; otherwise the
+file basename and extension choose a controlled highlighter, with plaintext as
+the safe fallback.
 
 ## Development
 
@@ -13,40 +36,21 @@ pnpm validate
 pnpm dev
 ```
 
-Open the Vite demo at `http://127.0.0.1:5173/`. The no-bundler fixture is at
-`/examples/consumer/index.html` after `pnpm build`.
+The no-bundler fixture is at `/examples/consumer/index.html` after `pnpm build`.
+The public package is MIT licensed and publishes the generated ES module,
+IIFE, and type declarations under `dist/`.
 
-## Consumer API
+## Benchmark
 
-```html
-<script src="./dist/share.iife.js"></script>
-<wc-diff-viewer language="typescript"></wc-diff-viewer>
-<script>
-  const viewer = document.querySelector('wc-diff-viewer');
-  viewer.oldText = 'const answer = 41;';
-  viewer.newText = 'const answer = 42;';
-  viewer.view = 'split';
-  viewer.wrap = true;
-</script>
+The repository is validated against a local capsule corpus of twenty mature,
+high-star open-source repositories and discussion-heavy pull requests. The
+corpus includes additions, deletions, renames, binary/generated files,
+no-newline markers, small reviews, and large multi-language reviews. It is
+kept outside the public package repository; run the corpus gate with:
+
+```sh
+DIFF_BENCHMARK_ROOT=/path/to/capsule/research/benchmark pnpm vitest run tests/benchmark-fixtures.test.ts
 ```
 
-The element exposes `oldText`, `newText`, `diffText`, `language`, `view`, and
-`wrap` properties. `diffText` accepts a unified patch and is normalized into
-the same line model as the old/new text path. The bundle registers the element
-idempotently as `wc-diff-viewer` and exports the model helpers for module
-consumers.
-
-Highlighting is intentionally limited to JavaScript, TypeScript, JSON, CSS,
-HTML/XML, Markdown, and a plain-text fallback. Caller text is never used as
-trusted template markup; plain text is escaped and the controlled highlighter
-is the only source of syntax markup.
-
-## Release shape
-
-- `dist/share.js`: minified ES module bundle.
-- `dist/share.iife.js`: minified plain-script bundle.
-- `dist/types/`: generated declarations and declaration maps.
-- `examples/consumer/index.html`: no-bundler consumer fixture.
-
-The repository is MIT licensed. The package remains private-use (`private:
-true`) so it is not accidentally published to npm.
+Use the generated `dist/share.js` for module consumers or
+`dist/share.iife.js` for a plain script tag.
