@@ -43,11 +43,41 @@ function createFixtureArgs(fixture: PullRequestFixture, theme: Theme = 'light'):
   };
 }
 
-function renderViewer(args: ViewerStoryArgs): HTMLElement {
-  const surface = document.createElement('section');
-  surface.className = 'showcase-surface';
-  surface.dataset.theme = args.theme;
+function createViewer(args: ViewerStoryArgs): DiffViewerElement {
+  const viewer = document.createElement('wc-diff-viewer') as DiffViewerElement;
+  viewer.setAttribute('data-theme', args.theme);
+  viewer.setAttribute('title', args.title);
+  viewer.setAttribute('old-label', args.oldLabel);
+  viewer.setAttribute('new-label', args.newLabel);
+  viewer.language = args.language;
+  viewer.view = args.view;
+  viewer.wrap = args.wrap;
+  if (args.diffText) {
+    viewer.diffText = args.diffText;
+  } else {
+    viewer.diffText = '';
+    viewer.oldText = args.oldText;
+    viewer.newText = args.newText;
+  }
+  return viewer;
+}
 
+function createSurface(theme: Theme, className = 'showcase-surface'): HTMLElement {
+  const surface = document.createElement('section');
+  surface.className = className;
+  surface.dataset.theme = theme;
+  return surface;
+}
+
+function createViewerFrame(viewer: DiffViewerElement): HTMLElement {
+  const frame = document.createElement('div');
+  frame.className = 'viewer-frame';
+  frame.append(viewer);
+  return frame;
+}
+
+function renderViewer(args: ViewerStoryArgs): HTMLElement {
+  const surface = createSurface(args.theme);
   const header = document.createElement('header');
   header.className = 'story-header';
 
@@ -76,25 +106,62 @@ function renderViewer(args: ViewerStoryArgs): HTMLElement {
     header.append(copy);
   }
 
-  const frame = document.createElement('div');
-  frame.className = 'viewer-frame';
-  const viewer = document.createElement('wc-diff-viewer') as DiffViewerElement;
-  viewer.setAttribute('data-theme', args.theme);
-  viewer.setAttribute('title', args.title);
-  viewer.setAttribute('old-label', args.oldLabel);
-  viewer.setAttribute('new-label', args.newLabel);
-  viewer.language = args.language;
-  viewer.view = args.view;
-  viewer.wrap = args.wrap;
-  if (args.diffText) {
-    viewer.diffText = args.diffText;
-  } else {
-    viewer.diffText = '';
-    viewer.oldText = args.oldText;
-    viewer.newText = args.newText;
+  surface.append(header, createViewerFrame(createViewer(args)));
+  return surface;
+}
+
+function renderBareViewer(args: ViewerStoryArgs): HTMLElement {
+  const surface = createSurface(args.theme, 'showcase-surface bare-surface');
+  surface.append(createViewerFrame(createViewer(args)));
+  return surface;
+}
+
+function renderSlotViewer(args: ViewerStoryArgs): HTMLElement {
+  const surface = createSurface(args.theme, 'showcase-surface');
+  const viewer = createViewer(args);
+
+  const contextHeader = document.createElement('header');
+  contextHeader.slot = 'header';
+  contextHeader.className = 'slot-context';
+  const contextCopy = document.createElement('div');
+  contextCopy.className = 'slot-context-copy';
+  const kicker = document.createElement('p');
+  kicker.className = 'slot-context-kicker';
+  kicker.textContent = 'Optional host context';
+  const heading = document.createElement('h1');
+  heading.className = 'slot-context-title';
+  heading.textContent = args.storyTitle;
+  const note = document.createElement('p');
+  note.className = 'slot-context-note';
+  note.textContent = args.note;
+  contextCopy.append(kicker, heading, note);
+  contextHeader.append(contextCopy);
+
+  if (args.sourceUrl) {
+    const link = document.createElement('a');
+    link.className = 'slot-context-link';
+    link.href = args.sourceUrl;
+    link.target = '_blank';
+    link.rel = 'noreferrer';
+    link.textContent = args.sourceLabel ?? 'Open source';
+    contextHeader.append(link);
   }
-  frame.append(viewer);
-  surface.append(header, frame);
+
+  const toolbarLink = document.createElement('a');
+  toolbarLink.slot = 'toolbar';
+  toolbarLink.className = 'slot-toolbar-link';
+  toolbarLink.href = args.sourceUrl ?? 'https://github.com/pankaj28843/web-components';
+  toolbarLink.target = '_blank';
+  toolbarLink.rel = 'noreferrer';
+  toolbarLink.textContent = 'Open linked context';
+
+  const footer = document.createElement('p');
+  footer.slot = 'footer';
+  footer.className = 'slot-footer-note';
+  footer.textContent = 'Footer context is projected by the host and remains optional.';
+
+  viewer.append(contextHeader, toolbarLink, footer);
+  surface.append(createViewerFrame(viewer));
   return surface;
 }
 
@@ -105,7 +172,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'A native custom element for GitHub-style unified and split diff review.',
+        component: 'A native custom element for standard unified diffs or text comparisons. Optional named slots let a host provide its own heading, links, actions, and footer context.',
       },
     },
   },
@@ -137,6 +204,22 @@ type Story = StoryObj<ViewerStoryArgs>;
 export const Unified: Story = {
   name: 'Unified · multi-file review',
   args: createFixtureArgs(pullRequestFixtures.react),
+};
+
+export const Bare: Story = {
+  name: 'Default · context-free',
+  render: renderBareViewer,
+  args: createFixtureArgs(pullRequestFixtures.react),
+};
+
+export const ContextSlots: Story = {
+  name: 'Composition · optional slots',
+  render: renderSlotViewer,
+  args: {
+    ...createFixtureArgs(pullRequestFixtures.typescript),
+    storyTitle: 'Build configuration diff',
+    note: 'The viewer renders the diff; the host supplies this heading, tagline, source link, action, and footer through optional named slots.',
+  },
 };
 
 export const Split: Story = {

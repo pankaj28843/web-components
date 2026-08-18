@@ -1,7 +1,7 @@
 {
   "name": "@pankaj28843/web-components",
   "version": "0.1.0",
-  "description": "A GitHub-style unified diff review web component with safe syntax highlighting.",
+  "description": "A context-neutral unified diff review web component with safe syntax highlighting.",
   "type": "module",
   "license": "MIT",
   "repository": {

@@ -9,6 +9,8 @@ function isViewMode(value: string | null | undefined): value is ViewMode {
   return value === 'unified' || value === 'split';
 }
 
+const diffViewerSlotNames = ['header', 'toolbar', 'footer'] as const;
+
 export class DiffViewerElement extends BaseElement {
   private _oldText = '';
   private _newText = '';
@@ -124,11 +126,12 @@ export class DiffViewerElement extends BaseElement {
     const diff = this.getDiffDocument();
     this.root.innerHTML = `<style>${diffViewerStyles}</style>
       <section class="shell" aria-labelledby="diff-viewer-title">
-        <header class="heading">
+        <div class="slot-region header-slot" data-slot-region="header" hidden>
+          <slot name="header" data-slot-name="header"></slot>
+        </div>
+        <header class="heading" data-role="default-heading">
           <div class="heading-copy">
-            <p class="eyebrow">Changed files</p>
             <h2 id="diff-viewer-title" data-role="title"></h2>
-            <p class="subtitle">Review a standard unified patch with file metadata, hunk provenance, syntax-aware code, and keyboard-friendly navigation.</p>
           </div>
           <span class="source-badge" data-role="source"></span>
         </header>
@@ -153,6 +156,9 @@ export class DiffViewerElement extends BaseElement {
           <button type="button" data-action="previous" aria-label="Previous search match">↑</button>
           <button type="button" data-action="next" aria-label="Next search match">↓</button>
           <button type="button" data-action="copy">Copy new side</button>
+          <div class="slot-region toolbar-slot" data-slot-region="toolbar" hidden>
+            <slot name="toolbar" data-slot-name="toolbar"></slot>
+          </div>
         </div>
         <div class="summary" aria-label="Diff statistics">
           <span class="stat" data-stat="files"></span>
@@ -163,13 +169,16 @@ export class DiffViewerElement extends BaseElement {
         </div>
         <div class="body" data-role="body"></div>
         <p class="status" data-role="status" aria-live="polite"></p>
+        <div class="slot-region footer-slot" data-slot-region="footer" hidden>
+          <slot name="footer" data-slot-name="footer"></slot>
+        </div>
       </section>`;
 
     const title = this.getAttribute('title')?.trim() || 'Diff review';
     const oldLabel = this.getAttribute('old-label')?.trim() || 'Base';
     const newLabel = this.getAttribute('new-label')?.trim() || 'Changed';
     this.setText('[data-role="title"]', title);
-    this.setText('[data-role="source"]', diff.source === 'unified' ? 'GIT UNIFIED DIFF' : 'TEXT COMPARISON');
+    this.setText('[data-role="source"]', diff.source === 'unified' ? 'UNIFIED DIFF' : 'TEXT COMPARISON');
     this.setText('[data-stat="files"]', `${diff.stats.files} ${diff.stats.files === 1 ? 'file' : 'files'}`);
     this.setText('[data-stat="hunks"]', `${diff.stats.hunks} ${diff.stats.hunks === 1 ? 'hunk' : 'hunks'}`);
     this.setText('[data-stat="added"]', `+${diff.stats.added}`);
@@ -213,6 +222,8 @@ export class DiffViewerElement extends BaseElement {
       });
       this.setText('[data-role="status"]', this.statusText(diff, result.renderedLines));
     }
+    this.bindSlotListeners();
+    this.syncSlotVisibility(title);
     this.applySearch(false);
   }
 
@@ -239,6 +250,55 @@ export class DiffViewerElement extends BaseElement {
     if (element) {
       element.textContent = value;
     }
+  }
+
+  private bindSlotListeners(): void {
+    for (const name of diffViewerSlotNames) {
+      this.root.querySelector<HTMLSlotElement>(`slot[data-slot-name="${name}"]`)
+        ?.addEventListener('slotchange', this.handleSlotChange);
+    }
+  }
+
+  private handleSlotChange = (): void => {
+    const title = this.getAttribute('title')?.trim() || 'Diff review';
+    this.syncSlotVisibility(title);
+  };
+
+  private syncSlotVisibility(title: string): void {
+    const headerSlot = this.root.querySelector<HTMLSlotElement>('slot[data-slot-name="header"]');
+    const headerAssigned = headerSlot ? this.slotHasContent(headerSlot) : false;
+
+    for (const slot of this.root.querySelectorAll<HTMLSlotElement>('slot[data-slot-name]')) {
+      const region = slot.closest<HTMLElement>('[data-slot-region]');
+      if (region) {
+        region.hidden = !this.slotHasContent(slot);
+      }
+    }
+
+    const defaultHeading = this.root.querySelector<HTMLElement>('[data-role="default-heading"]');
+    if (defaultHeading) {
+      defaultHeading.hidden = headerAssigned;
+    }
+
+    const shell = this.root.querySelector<HTMLElement>('.shell');
+    if (shell) {
+      if (headerAssigned) {
+        shell.removeAttribute('aria-labelledby');
+        shell.setAttribute('aria-label', title);
+      } else {
+        shell.setAttribute('aria-labelledby', 'diff-viewer-title');
+        shell.removeAttribute('aria-label');
+      }
+    }
+  }
+
+  private slotHasContent(slot: HTMLSlotElement): boolean {
+    return slot.assignedNodes({ flatten: true }).some((node) => {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        return true;
+      }
+      return node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim().length > 0;
+    });
   }
 
   private handleClick = (event: Event): void => {
