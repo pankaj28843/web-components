@@ -615,7 +615,7 @@ input[type="checkbox"] {
   margin: 0;
   padding: 0.3rem 0.75rem 0.3rem 0.35rem;
   color: var(--wc-fg);
-  font: var(--wc-font-size-compact)/1.5 var(--wc-code-font);
+  font: var(--wc-font-size-base)/1.5 var(--wc-code-font);
   tab-size: 2;
   white-space: pre;
 }
