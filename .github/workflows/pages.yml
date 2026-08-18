@@ -1,0 +1,73 @@
+name: Deploy Storybook to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+    env:
+      STORYBOOK_REQUIRED_TITLES: 'Components/Diff viewer'
+      STORYBOOK_REQUIRED_NAMES: 'Unified · multi-file review|Split · paired lines|Theme · dark|Theme · light|Responsive · narrow fallback|Interaction · search, wrap, copy|PR · React #36944|PR · TypeScript #40336|PR · Kubernetes #137050|PR · Go #79774|PR · Node.js #62241|PR · Angular #69860|State · text comparison|State · invalid patch'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Run library gates
+        run: pnpm check
+
+      - name: Build Storybook
+        run: pnpm build:storybook
+
+      - name: Check Storybook artifact
+        run: pnpm check:storybook
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: storybook-static
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Verify published Storybook
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: curl --fail --location --retry 8 --retry-delay 5 --retry-all-errors "$PAGE_URL"
