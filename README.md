@@ -1,5 +1,7 @@
 # Native web components
 
+**Live showcase:** [pankaj28843.github.io/web-components](https://pankaj28843.github.io/web-components/)
+
 `<wc-diff-viewer>` renders a standard Git unified diff as a GitHub-style
 changed-files review: file navigation, status and mode metadata, hunk headers,
 old/new line gutters, unified or split view, responsive fallback, search, copy,
@@ -35,6 +37,9 @@ pnpm install
 pnpm validate
 pnpm dev
 ```
+
+Run the component catalog locally with `pnpm storybook` or build the static
+showcase with `pnpm build:storybook`.
 
 The no-bundler fixture is at `/examples/consumer/index.html` after `pnpm build`.
 The public package is MIT licensed and publishes the generated ES module,

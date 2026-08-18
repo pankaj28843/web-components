@@ -142,7 +142,7 @@ export class DiffViewerElement extends BaseElement {
             <select data-field="language" aria-label="Syntax language"></select>
           </label>
           <label class="field">
-            <input type="checkbox" data-field="wrap" />
+            <input type="checkbox" data-field="wrap" aria-label="Wrap lines" />
             <span>Wrap lines</span>
           </label>
           <label class="field search-field">

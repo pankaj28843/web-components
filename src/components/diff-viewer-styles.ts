@@ -829,6 +829,105 @@ mark[data-search-mark][data-active="true"] {
   mark[data-search-mark][data-active="true"] { background: #f0883e; }
 }
 
+:host([data-theme="light"]) {
+  --wc-canvas: #ffffff;
+  --wc-canvas-subtle: #f6f8fa;
+  --wc-canvas-inset: #f0f2f4;
+  --wc-border: #d0d7de;
+  --wc-border-muted: #d8dee4;
+  --wc-fg: #1f2328;
+  --wc-muted: #656d76;
+  --wc-accent: #0969da;
+  --wc-accent-muted: #ddf4ff;
+  --wc-added: #1a7f37;
+  --wc-added-bg: #dafbe1;
+  --wc-added-gutter: #aceebb;
+  --wc-removed: #cf222e;
+  --wc-removed-bg: #ffebe9;
+  --wc-removed-gutter: #ffcecb;
+  --wc-warning: #9a6700;
+  --wc-warning-bg: #fff8c5;
+  color-scheme: light;
+}
+
+:host([data-theme="light"]) .hljs-comment,
+:host([data-theme="light"]) .hljs-quote { color: #6e7781; }
+:host([data-theme="light"]) .hljs-keyword,
+:host([data-theme="light"]) .hljs-selector-tag,
+:host([data-theme="light"]) .hljs-literal,
+:host([data-theme="light"]) .hljs-section,
+:host([data-theme="light"]) .hljs-link { color: #8250df; }
+:host([data-theme="light"]) .hljs-string,
+:host([data-theme="light"]) .hljs-attr,
+:host([data-theme="light"]) .hljs-addition,
+:host([data-theme="light"]) .hljs-symbol,
+:host([data-theme="light"]) .hljs-bullet { color: #116329; }
+:host([data-theme="light"]) .hljs-number,
+:host([data-theme="light"]) .hljs-regexp,
+:host([data-theme="light"]) .hljs-variable,
+:host([data-theme="light"]) .hljs-template-variable { color: #953800; }
+:host([data-theme="light"]) .hljs-title,
+:host([data-theme="light"]) .hljs-title.class_,
+:host([data-theme="light"]) .hljs-title.function_,
+:host([data-theme="light"]) .hljs-type,
+:host([data-theme="light"]) .hljs-built_in { color: #0550ae; }
+:host([data-theme="light"]) .hljs-meta,
+:host([data-theme="light"]) .hljs-meta .hljs-keyword { color: #cf222e; }
+:host([data-theme="light"]) mark[data-search-mark] {
+  background: #fff8c5;
+  color: #1f2328;
+  box-shadow: 0 0 0 1px #d4a72c;
+}
+:host([data-theme="light"]) mark[data-search-mark][data-active="true"] {
+  background: #ffb700;
+  box-shadow: 0 0 0 2px #9a6700;
+}
+
+:host([data-theme="dark"]) {
+  --wc-canvas: #0d1117;
+  --wc-canvas-subtle: #161b22;
+  --wc-canvas-inset: #21262d;
+  --wc-border: #30363d;
+  --wc-border-muted: #30363d;
+  --wc-fg: #e6edf3;
+  --wc-muted: #8b949e;
+  --wc-accent: #58a6ff;
+  --wc-accent-muted: #12263d;
+  --wc-added: #3fb950;
+  --wc-added-bg: #12261b;
+  --wc-added-gutter: #1d4427;
+  --wc-removed: #f85149;
+  --wc-removed-bg: #2b1718;
+  --wc-removed-gutter: #55201f;
+  --wc-warning: #d29922;
+  --wc-warning-bg: #2d220d;
+  color-scheme: dark;
+}
+
+:host([data-theme="dark"]) .hljs-comment,
+:host([data-theme="dark"]) .hljs-quote { color: #8b949e; }
+:host([data-theme="dark"]) .hljs-keyword,
+:host([data-theme="dark"]) .hljs-selector-tag,
+:host([data-theme="dark"]) .hljs-literal,
+:host([data-theme="dark"]) .hljs-section,
+:host([data-theme="dark"]) .hljs-link { color: #ff7b72; }
+:host([data-theme="dark"]) .hljs-string,
+:host([data-theme="dark"]) .hljs-attr,
+:host([data-theme="dark"]) .hljs-addition,
+:host([data-theme="dark"]) .hljs-symbol,
+:host([data-theme="dark"]) .hljs-bullet { color: #a5d6ff; }
+:host([data-theme="dark"]) .hljs-number,
+:host([data-theme="dark"]) .hljs-regexp,
+:host([data-theme="dark"]) .hljs-variable,
+:host([data-theme="dark"]) .hljs-template-variable { color: #79c0ff; }
+:host([data-theme="dark"]) .hljs-title,
+:host([data-theme="dark"]) .hljs-title.class_,
+:host([data-theme="dark"]) .hljs-title.function_,
+:host([data-theme="dark"]) .hljs-type,
+:host([data-theme="dark"]) .hljs-built_in { color: #d2a8ff; }
+:host([data-theme="dark"]) mark[data-search-mark] { background: #bb8009; color: #fff; }
+:host([data-theme="dark"]) mark[data-search-mark][data-active="true"] { background: #f0883e; }
+
 @media (max-width: 760px) {
   .heading {
     padding: 0.85rem;

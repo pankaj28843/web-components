@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      STORYBOOK_REQUIRED_TITLES: 'Components/Diff viewer'
+      STORYBOOK_REQUIRED_NAMES: 'Unified · multi-file review|Split · paired lines|Theme · dark|Theme · light|Responsive · narrow fallback|Interaction · search, wrap, copy|PR · React #36944|PR · TypeScript #40336|PR · Kubernetes #137050|PR · Go #79774|PR · Node.js #62241|PR · Angular #69860|State · text comparison|State · invalid patch'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run library gates
+        run: pnpm check
+
+      - name: Build Storybook
+        run: pnpm build:storybook
+
+      - name: Check Storybook artifact
+        run: pnpm check:storybook
