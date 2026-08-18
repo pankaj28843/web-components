@@ -38,4 +38,23 @@ describe('highlight registry', () => {
     expect(output).toBe(escapeHtml('<img src=x onerror=alert(1)>'));
     expect(output).not.toContain('<img');
   });
+
+  it('infers each file independently in a mixed-language patch', () => {
+    const files = [
+      ['index.html', '<button>Save</button>'],
+      ['styles.css', '.button { color: red; }'],
+      ['src/main.ts', 'const count: number = 1;'],
+      ['src/boot.js', 'export function boot() {}'],
+    ] as const;
+
+    expect(files.map(([path]) => inferLanguageFromPath(path))).toEqual([
+      'xml',
+      'css',
+      'typescript',
+      'javascript',
+    ]);
+
+    const outputs = files.map(([path, code]) => highlightCodeForPath(code, path));
+    expect(outputs.every((output) => output.includes('hljs-'))).toBe(true);
+  });
 });

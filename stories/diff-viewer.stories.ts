@@ -15,7 +15,7 @@ interface ViewerStoryArgs {
   theme: Theme;
   view: ViewMode;
   wrap: boolean;
-  language: string;
+  language?: string;
   title: string;
   oldLabel: string;
   newLabel: string;
@@ -33,7 +33,6 @@ function createFixtureArgs(fixture: PullRequestFixture, theme: Theme = 'light'):
     theme,
     view: 'unified',
     wrap: false,
-    language: fixture.language,
     title: `${fixture.repository} · PR #${fixture.number}`,
     oldLabel: 'Base',
     newLabel: 'PR head',
@@ -49,7 +48,9 @@ function createViewer(args: ViewerStoryArgs): DiffViewerElement {
   viewer.setAttribute('title', args.title);
   viewer.setAttribute('old-label', args.oldLabel);
   viewer.setAttribute('new-label', args.newLabel);
-  viewer.language = args.language;
+  if (args.language) {
+    viewer.language = args.language;
+  }
   viewer.view = args.view;
   viewer.wrap = args.wrap;
   if (args.diffText) {
@@ -180,10 +181,6 @@ const meta = {
     theme: { control: 'inline-radio', options: ['light', 'dark'] },
     view: { control: 'inline-radio', options: ['unified', 'split'] },
     wrap: { control: 'boolean' },
-    language: {
-      control: 'select',
-      options: ['auto', 'javascript', 'typescript', 'go', 'cpp', 'json', 'plaintext'],
-    },
     diffText: { control: 'text' },
     oldText: { control: 'text' },
     newText: { control: 'text' },
@@ -260,6 +257,55 @@ export const InteractionStates: Story = {
   },
 };
 
+const mixedLanguagePatch = `diff --git a/index.html b/index.html
+--- a/index.html
++++ b/index.html
+@@ -1,2 +1,3 @@
+ <!doctype html>
+-<title>Demo</title>
++<link rel="stylesheet" href="styles.css">
++<title>Demo</title>
+diff --git a/styles.css b/styles.css
+--- a/styles.css
++++ b/styles.css
+@@ -1,3 +1,4 @@
+ body {
+   color: black;
++  background: white;
+ }
+diff --git a/src/main.ts b/src/main.ts
+--- a/src/main.ts
++++ b/src/main.ts
+@@ -1 +1,2 @@
+-export const answer = 41;
++const answer: number = 42;
++export { answer };
+diff --git a/src/boot.js b/src/boot.js
+--- a/src/boot.js
++++ b/src/boot.js
+@@ -1 +1,3 @@
+-export function boot() {}
++export function boot() {
++  console.log("boot");
++}`;
+
+export const PerFileLanguage: Story = {
+  name: 'Detection · per-file language',
+  args: {
+    storyTitle: 'Mixed-language patch',
+    note: 'HTML, CSS, TypeScript, and JavaScript are detected independently from their file paths.',
+    theme: 'light',
+    view: 'unified',
+    wrap: false,
+    title: 'Mixed-language patch',
+    oldLabel: 'Base',
+    newLabel: 'Changed',
+    diffText: mixedLanguagePatch,
+    oldText: '',
+    newText: '',
+  },
+};
+
 export const ReactPR36944: Story = {
   name: 'PR · React #36944',
   args: createFixtureArgs(pullRequestFixtures.react),
@@ -316,7 +362,6 @@ export const ParserEdgeStates: Story = {
     theme: 'dark',
     view: 'unified',
     wrap: false,
-    language: 'plaintext',
     title: 'Malformed patch',
     oldLabel: 'Base',
     newLabel: 'Changed',

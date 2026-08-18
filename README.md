@@ -26,11 +26,13 @@ consumer, not as a required component shell.
 ```
 
 The element accepts `diffText` for a unified patch and also retains
-`oldText`/`newText` for direct text comparisons. Optional properties and
-attributes are `language="auto"`, `view="unified" | "split"`, `wrap`, `title`,
-`old-label`, `new-label`, and `path`. An explicit language wins; otherwise the
-file basename and extension choose a controlled highlighter, with plaintext as
-the safe fallback.
+`oldText`/`newText` for direct text comparisons. In a unified multi-file patch,
+each file is highlighted independently from its basename or extension—there is
+no meaningful global language to provide. Optional properties and attributes
+are `view="unified" | "split"`, `wrap`, `title`, `old-label`, `new-label`, and
+`path`. The backwards-compatible `language="..."` escape hatch is only useful
+for pathless old/new text comparisons or extensionless content; plaintext is
+the safe fallback when inference has no match.
 
 ## Optional host context
 

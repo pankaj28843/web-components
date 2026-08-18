@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       STORYBOOK_REQUIRED_TITLES: 'Components/Diff viewer'
-      STORYBOOK_REQUIRED_NAMES: 'Unified · multi-file review|Default · context-free|Composition · optional slots|Split · paired lines|Theme · dark|Theme · light|Responsive · narrow fallback|Interaction · search, wrap, copy|PR · React #36944|PR · TypeScript #40336|PR · Kubernetes #137050|PR · Go #79774|PR · Node.js #62241|PR · Angular #69860|State · text comparison|State · invalid patch'
+      STORYBOOK_REQUIRED_NAMES: 'Unified · multi-file review|Default · context-free|Composition · optional slots|Split · paired lines|Theme · dark|Theme · light|Responsive · narrow fallback|Interaction · search, wrap, copy|PR · React #36944|PR · TypeScript #40336|PR · Kubernetes #137050|PR · Go #79774|PR · Node.js #62241|PR · Angular #69860|State · text comparison|State · invalid patch|Detection · per-file language'
     steps:
       - name: Check out source
         uses: actions/checkout@v5

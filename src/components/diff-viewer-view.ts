@@ -6,7 +6,7 @@ export type ViewMode = 'unified' | 'split';
 export interface DiffRenderOptions {
   view: ViewMode;
   wrap: boolean;
-  language: string;
+  languageOverride?: string | null;
   oldLabel: string;
   newLabel: string;
   collapsedFiles: ReadonlySet<string>;
@@ -222,7 +222,7 @@ function createLineNumber(value: number | null, side: 'old' | 'new'): HTMLElemen
 function createCodeCell(
   line: DiffLine | null,
   file: DiffFile,
-  language: string,
+  languageOverride: string | null | undefined,
   side: 'old' | 'new' | 'unified',
 ): HTMLElement {
   const cell = document.createElement('div');
@@ -237,7 +237,7 @@ function createCodeCell(
     code.textContent = ' ';
   } else {
     code.dataset.raw = line.text;
-    code.innerHTML = highlightCodeForPath(line.text, pathForFile(file), language);
+    code.innerHTML = highlightCodeForPath(line.text, pathForFile(file), languageOverride);
     if (line.text.length === 0) {
       code.classList.add('empty-code');
       code.append(document.createTextNode(' '));
@@ -275,7 +275,7 @@ function lineLabel(line: DiffLine | null): string {
   return `${kind} line ${number}: ${line.text || 'blank'}`;
 }
 
-function createUnifiedLine(line: DiffLine, file: DiffFile, language: string): HTMLElement {
+function createUnifiedLine(line: DiffLine, file: DiffFile, languageOverride: string | null | undefined): HTMLElement {
   const row = document.createElement('div');
   row.className = 'diff-line unified-line';
   row.dataset.kind = line.kind;
@@ -286,7 +286,7 @@ function createUnifiedLine(line: DiffLine, file: DiffFile, language: string): HT
     createLineNumber(line.oldLine, 'old'),
     createLineNumber(line.newLine, 'new'),
     createMarker(line),
-    createCodeCell(line, file, language, 'unified'),
+    createCodeCell(line, file, languageOverride, 'unified'),
   );
   return row;
 }
@@ -326,7 +326,7 @@ function pairedLines(lines: readonly DiffLine[]): SplitPair[] {
   return pairs;
 }
 
-function createSplitSide(line: DiffLine | null, file: DiffFile, language: string, side: 'old' | 'new'): HTMLElement {
+function createSplitSide(line: DiffLine | null, file: DiffFile, languageOverride: string | null | undefined, side: 'old' | 'new'): HTMLElement {
   const element = document.createElement('div');
   element.className = 'split-side';
   element.dataset.side = side;
@@ -336,17 +336,17 @@ function createSplitSide(line: DiffLine | null, file: DiffFile, language: string
   element.append(
     createLineNumber(line?.[side === 'old' ? 'oldLine' : 'newLine'] ?? null, side),
     createMarker(line),
-    createCodeCell(line, file, language, side),
+    createCodeCell(line, file, languageOverride, side),
   );
   return element;
 }
 
-function createSplitLine(pair: SplitPair, file: DiffFile, language: string): HTMLElement {
+function createSplitLine(pair: SplitPair, file: DiffFile, languageOverride: string | null | undefined): HTMLElement {
   const row = document.createElement('div');
   row.className = 'split-line';
   row.append(
-    createSplitSide(pair.oldLine, file, language, 'old'),
-    createSplitSide(pair.newLine, file, language, 'new'),
+    createSplitSide(pair.oldLine, file, languageOverride, 'old'),
+    createSplitSide(pair.newLine, file, languageOverride, 'new'),
   );
   return row;
 }
@@ -396,7 +396,7 @@ function createHunk(hunk: DiffHunk, file: DiffFile, options: DiffRenderOptions):
   unifiedLabels.append(document.createElement('span'), oldLabel, newLabel, codeLabel);
   unified.append(unifiedLabels);
   for (const line of hunk.lines) {
-    unified.append(createUnifiedLine(line, file, options.language));
+    unified.append(createUnifiedLine(line, file, options.languageOverride));
   }
   lines.append(unified);
 
@@ -418,7 +418,7 @@ function createHunk(hunk: DiffHunk, file: DiffFile, options: DiffRenderOptions):
     splitHeader.append(oldLabel, newLabel);
     split.append(splitHeader);
     for (const pair of pairedLines(hunk.lines)) {
-      split.append(createSplitLine(pair, file, options.language));
+      split.append(createSplitLine(pair, file, options.languageOverride));
     }
     lines.append(split);
   }

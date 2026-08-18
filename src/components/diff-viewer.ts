@@ -1,6 +1,6 @@
 import type { DiffDocument } from '../diff/model';
 import { createDiff, parseUnifiedDiff } from '../diff/model';
-import { getLanguageOptions, normalizeLanguage } from '../highlight/registry';
+import { normalizeLanguage } from '../highlight/registry';
 import { BaseElement } from '../platform/base-element';
 import { diffViewerStyles } from './diff-viewer-styles';
 import { renderDiffBody, type ViewMode } from './diff-viewer-view';
@@ -70,6 +70,10 @@ export class DiffViewerElement extends BaseElement {
     return this._language;
   }
 
+  /**
+   * Keeps the pathless text-comparison escape hatch compatible. Unified
+   * patches intentionally infer syntax independently from each file path.
+   */
   public set language(value: string) {
     const normalized = normalizeLanguage(value);
     this._language = normalized;
@@ -141,10 +145,6 @@ export class DiffViewerElement extends BaseElement {
             <button type="button" data-action="view" data-value="split" aria-pressed="false">Split</button>
           </div>
           <label class="field">
-            <span>Language</span>
-            <select data-field="language" aria-label="Syntax language"></select>
-          </label>
-          <label class="field">
             <input type="checkbox" data-field="wrap" aria-label="Wrap lines" />
             <span>Wrap lines</span>
           </label>
@@ -185,17 +185,6 @@ export class DiffViewerElement extends BaseElement {
     this.setText('[data-stat="removed"]', `−${diff.stats.removed}`);
     this.setText('[data-role="line-summary"]', `${oldLabel}: ${diff.stats.oldLines} lines · ${newLabel}: ${diff.stats.newLines} lines`);
 
-    const languageSelect = this.root.querySelector<HTMLSelectElement>('[data-field="language"]');
-    if (languageSelect) {
-      for (const option of getLanguageOptions()) {
-        const element = document.createElement('option');
-        element.value = option.value;
-        element.textContent = option.label;
-        languageSelect.append(element);
-      }
-      languageSelect.value = this._language;
-    }
-
     const wrapInput = this.root.querySelector<HTMLInputElement>('[data-field="wrap"]');
     if (wrapInput) {
       wrapInput.checked = this._wrap;
@@ -215,7 +204,7 @@ export class DiffViewerElement extends BaseElement {
       const result = renderDiffBody(body, diff, {
         view: this._view,
         wrap: this._wrap,
-        language: this._language,
+        languageOverride: diff.source === 'texts' ? this._language : undefined,
         oldLabel,
         newLabel,
         collapsedFiles: this._collapsedFiles,
@@ -345,9 +334,7 @@ export class DiffViewerElement extends BaseElement {
 
   private handleChange = (event: Event): void => {
     const target = event.target;
-    if (target instanceof HTMLSelectElement && target.dataset.field === 'language') {
-      this.language = target.value;
-    } else if (target instanceof HTMLInputElement && target.dataset.field === 'wrap') {
+    if (target instanceof HTMLInputElement && target.dataset.field === 'wrap') {
       this.wrap = target.checked;
     }
   };

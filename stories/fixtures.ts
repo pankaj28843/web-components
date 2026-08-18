@@ -6,7 +6,6 @@ export interface PullRequestFixture {
   role: string;
   discussion: string;
   url: string;
-  language: string;
   patch: string;
 }
 
@@ -21,7 +20,6 @@ export const pullRequestFixtures = {
     role: '15-file JavaScript and CSS review · 14 comments · 18 review comments',
     discussion: 'A compact excerpt from a multi-file, discussion-bearing React review.',
     url: 'https://github.com/react/react/pull/36944',
-    language: 'javascript',
     patch: `diff --git a/packages/react-dom/src/client/ReactDOMRoot.js b/packages/react-dom/src/client/ReactDOMRoot.js
 index 5a1a2aa..d7e5e11 100644
 --- a/packages/react-dom/src/client/ReactDOMRoot.js
@@ -55,7 +53,6 @@ index 27cb0f2..b1cb2ef 100644
     role: '40 files · 208 comments · 28 review comments',
     discussion: 'A deliberately discussion-heavy compiler review with a small readable excerpt.',
     url: 'https://github.com/microsoft/TypeScript/pull/40336',
-    language: 'typescript',
     patch: `diff --git a/src/compiler/checker.ts b/src/compiler/checker.ts
 index 0b4f1a2..4f0c2d8 100644
 --- a/src/compiler/checker.ts
@@ -89,7 +86,6 @@ index 8da9d10..ce4f7ab 100644
     role: '219 files · 49 comments · 461 review comments',
     discussion: 'The large generated-file review is represented by Go plus YAML/protobuf-shaped files.',
     url: 'https://github.com/kubernetes/kubernetes/pull/137050',
-    language: 'go',
     patch: `diff --git a/pkg/registry/apps/deployment/storage.go b/pkg/registry/apps/deployment/storage.go
 index 9dd0f4a..b03c02e 100644
 --- a/pkg/registry/apps/deployment/storage.go
@@ -123,7 +119,6 @@ index 3b02a88..f9a9a0e 100644
     role: 'Closed, unmerged discussion-heavy review · 57 comments',
     discussion: 'Kept because a closed/unmerged PR is a meaningful review surface, not a parser failure.',
     url: 'https://github.com/golang/go/pull/79774',
-    language: 'go',
     patch: `diff --git a/src/cmd/go/testdata/script/review.txt b/src/cmd/go/testdata/script/review.txt
 index 4a7f91a..7bca8d4 100644
 --- a/src/cmd/go/testdata/script/review.txt
@@ -157,7 +152,6 @@ index 42d19a1..26e4d02 100644
     role: '11 files · 37 comments · 19 review comments',
     discussion: 'A mixed C++, header, JavaScript, and docs-shaped review excerpt.',
     url: 'https://github.com/nodejs/node/pull/62241',
-    language: 'cpp',
     patch: `diff --git a/src/node_file.cc b/src/node_file.cc
 index d08a7a3..afc1b9c 100644
 --- a/src/node_file.cc
@@ -189,7 +183,6 @@ ${blankContextLine}
     role: '16 files · 1 comment · 113 review comments',
     discussion: 'A review-heavy TypeScript, Bazel, HTML, and tooling-shaped input.',
     url: 'https://github.com/angular/angular/pull/69860',
-    language: 'typescript',
     patch: `diff --git a/packages/compiler-cli/src/ngtsc/typecheck/src/context.ts b/packages/compiler-cli/src/ngtsc/typecheck/src/context.ts
 index 7d7d4a2..9e20df1 100644
 --- a/packages/compiler-cli/src/ngtsc/typecheck/src/context.ts
